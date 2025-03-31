@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from models import db, User, RepairRequest, Technician, Inventory, Payment
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root123@localhost/electronic'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'
 
@@ -16,7 +16,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(int(user_id)) if user_id else None
 
 # -------- Home Page --------
 @app.route('/')
@@ -29,27 +29,29 @@ def register():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
-        password = bcrypt.generate_password_hash(request.form['password']).decode('utf-8')
-        role = "customer"  # Default role
+        password = request.form['password']
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash('Email already exists! Please log in.', 'danger')
             return redirect(url_for('login'))
 
-        new_user = User(name=name, email=email, password=password, role=role)
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        new_user = User(name=name, email=email, password=hashed_password, role="customer")
         db.session.add(new_user)
         db.session.commit()
+
         flash('Account created successfully! You can now log in.', 'success')
         return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 # -------- User Login --------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form.get('password')
 
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
@@ -120,9 +122,14 @@ def assign_technician(request_id):
 
     technician_id = request.form.get('technician_id')
     repair_request = RepairRequest.query.get_or_404(request_id)
-    repair_request.assigned_technician = technician_id
-    db.session.commit()
-    flash('Technician assigned successfully!', 'success')
+    
+    if technician_id and technician_id.isdigit():
+        repair_request.assigned_technician = int(technician_id)
+        db.session.commit()
+        flash('Technician assigned successfully!', 'success')
+    else:
+        flash('Invalid technician ID!', 'danger')
+    
     return redirect(url_for('admin'))
 
 # -------- Inventory Management --------
@@ -140,8 +147,13 @@ def inventory():
 @app.route('/payment/<int:request_id>', methods=['POST'])
 @login_required
 def process_payment(request_id):
-    amount = request.form['amount']
-    new_payment = Payment(request_id=request_id, amount=amount, status="Paid")
+    amount = request.form.get('amount')
+    
+    if not amount or not amount.isdigit():
+        flash('Invalid amount!', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    new_payment = Payment(request_id=request_id, amount=int(amount), status="Paid")
     db.session.add(new_payment)
     db.session.commit()
     flash('Payment successful!', 'success')
