@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Admin Panel</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Device</th>
+            <th>Issue</th>
+            <th>Status</th>
+        </tr>
+        {% for request in requests %}
+        <tr>
+            <td>{{ request.id }}</td>
+            <td>{{ request.name }}</td>
+            <td>{{ request.device }}</td>
+            <td>{{ request.issue }}</td>
+            <td>{{ request.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
