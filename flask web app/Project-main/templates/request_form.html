@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Request a Repair</h2>
+    <form method="POST">
+        <label>Name:</label>
+        <input type="text" name="name" required>
+        <label>Email:</label>
+        <input type="email" name="email" required>
+        <label>Device:</label>
+        <input type="text" name="device" required>
+        <label>Issue:</label>
+        <textarea name="issue" required></textarea>
+        <button type="submit">Submit Request</button>
+    </form>
+{% endblock %}

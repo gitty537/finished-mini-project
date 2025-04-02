@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<h2>Payment Processing</h2>
+
+<!-- Payment Form -->
+<form method="POST" action="{{ url_for('process_payment', request_id=request.id) }}">
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" class="form-control" id="amount" name="amount" required>
+    </div>
+    <button type="submit" class="btn btn-success">Pay Now</button>
+</form>
+
+<hr>
+
+<!-- Payment History -->
+<h3>Payment History</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Request ID</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for payment in payments %}
+        <tr>
+            <td>{{ payment.request_id }}</td>
+            <td>${{ payment.amount }}</td>
+            <td>{{ payment.status }}</td>
+            <td>{{ payment.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Welcome, {{ current_user.name }}!</h2>
+    <p>Your role: <strong>{{ current_user.role }}</strong></p>
+    
+    {% if current_user.role == 'customer' %}
+    <a href="{{ url_for('request_repair') }}" class="btn btn-success">Request Repair</a>
+    {% endif %}
+    
+    <h3 class="mt-4">Your Repair Requests</h3>
+    {% if requests %}
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Device</th>
+                <th>Issue</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.device }}</td>
+                <td>{{ request.issue }}</td>
+                <td>{{ request.status }}</td>
+                <td>
+                    <a href="{{ url_for('track_status', request_id=request.id) }}" class="btn btn-info btn-sm">Track</a>
+                    {% if request.status == 'Pending Payment' %}
+                    <form action="{{ url_for('process_payment', request_id=request.id) }}" method="post" class="d-inline">
+                        <input type="hidden" name="amount" value="100">  <!-- Example amount -->
+                        <button type="submit" class="btn btn-warning btn-sm">Pay</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No repair requests found.</p>
+    {% endif %}
+    
+    {% if current_user.role == 'admin' %}
+    <h3 class="mt-4">Admin Panel</h3>
+    <a href="{{ url_for('admin') }}" class="btn btn-danger">Go to Admin Panel</a>
+    <a href="{{ url_for('inventory') }}" class="btn btn-secondary">Manage Inventory</a>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}" class="btn btn-primary mt-4">Logout</a>
+</div>
+{% endblock %}

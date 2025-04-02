@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #7197a4;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    border: black 20px;
+    background-color: #7a3838;
+    color: rgb(71, 58, 58);
+    padding: 30px;
+    text-align: center;
+}
+
+nav a {
+    border-width: 10px;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: rgb(255, 255, 255);
+    padding: 15px;
+    color: rgb(20, 7, 7);
+    text-decoration: rgb(11, 50, 47);
+    margin: 30px;
+}
+
+.container {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    border-radius: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background: rgb(178, 136, 125);
+    padding: 100px;
+    box-shadow: 0px 0px 10px gray;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input, textarea {
+    margin: 10px 0;
+    padding: 8px;
+    width: 100%;
+}
+
+button {
+    background-color: rgba(144, 64, 64, 0.879);
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
